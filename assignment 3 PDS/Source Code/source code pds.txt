@@ -1,0 +1,74 @@
+import pandas as pd
+import numpy as np
+
+import matplotlib.pyplot as plt
+import plotly.express as px
+import seaborn as sns
+
+import nltk
+import string
+#from itertools import chain
+from collections import Counter
+from wordcloud import WordCloud
+
+
+from tensorflow.keras.preprocessing.text import Tokenizer
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
+
+import nltk
+nltk.download('stopwords')
+
+data = pd.read_csv('/content/Corona_NLP_test.csv')
+
+data.head()
+
+data.isnull().sum()
+
+data['OriginalTweet'] = data['OriginalTweet'] 
+
+stop_words = set(stopwords.words('english'))
+to_remove = ['•', '!', '"', '#', '”', '“', '$', '%', '&', "'", '–', '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '…']
+stop_words.update(to_remove)
+print('Number of stopwords:', len(stop_words))
+
+def preprocess_text(OriginalTweet):
+    OriginalTweet = OriginalTweet.lower()
+    OriginalTweet = re.sub(r'http\S+', '', OriginalTweet)
+    OriginalTweet = re.sub('\[[^]]*\]', '', OriginalTweet)
+    OriginalTweet = (" ").join([word for word in OriginalTweet.split() if not word in stop_words])
+    OriginalTweet = "".join([char for char in OriginalTweet if not char in to_remove])
+    return OriginalTweet
+
+
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+
+# define the text data to be analyzed
+
+OriginalTweet = ' '.join(data['OriginalTweet'].tolist())
+
+# generate the word cloud
+wordcloud = WordCloud(width=1920, height=1080).generate(OriginalTweet)
+
+# display the word cloud
+fig = plt.figure(figsize=(20, 20), facecolor='k', edgecolor='k')
+plt.imshow(wordcloud)
+plt.axis('off')
+plt.tight_layout(pad=0)
+plt.show()
+
+
+mostrepeated = Counter(" ".join(data["OriginalTweet"]).split()).most_common(100)
+mostrepeated
+
+X = [d.split() for d in data['OriginalTweet'].tolist()]
+
+print(X[0])
+
+# Tokenising the model 
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(X)
+X = tokenizer.texts_to_sequences(X)
+
+tokenizer.word_index
